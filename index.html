@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopee Transaction Analytics Pipeline</title>
+    <!-- Thư viện đọc Excel & vẽ biểu đồ qua CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div>
+                <h1>Shopee Transaction Analytics</h1>
+                <p>Node.js Express Web Pipeline &bull; Đồng bộ schema <code>shopee_pipeline.py</code> &amp; <code>TransactionsNew</code></p>
+            </div>
+            <div class="header-actions">
+                <select id="presetSelect" class="select-preset" title="Chọn bộ dữ liệu có sẵn trên Server">
+                    <option value="Shopee_Simulated_Transactions.xlsx">Dataset 1: Shopee_Simulated_Transactions.xlsx (1.000 dòng)</option>
+                    <option value="Shopee_TransactionsNew.xlsx">Dataset 2: Shopee_TransactionsNew.xlsx (5.000 dòng)</option>
+                    <option value="__simulated__">Dữ liệu mô phỏng nhanh (600 dòng)</option>
+                </select>
+                <label for="fileInput" class="btn btn-primary">
+                    Tải Lên File (.xlsx / .csv)
+                    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Thanh trạng thái dữ liệu -->
+        <section class="status-bar" id="statusBar">
+            <span id="datasetInfo">Đang tải dữ liệu từ server Express...</span>
+            <div class="export-group">
+                <button id="btnDownloadSample" class="btn btn-sm">Tải File Mẫu (.xlsx)</button>
+                <button id="btnExportClean" class="btn btn-sm">Xuất Excel Đã Làm Sạch</button>
+                <button id="btnExportReport" class="btn btn-sm">Xuất Báo Cáo (.txt)</button>
+            </div>
+        </section>
+
+        <!-- 1. Kiểm toán làm sạch dữ liệu (DataCleaner) -->
+        <section class="card">
+            <h2>1. Quy Trình Làm Sạch Dữ Liệu (DataCleaner Audit)</h2>
+            <div class="audit-grid" id="auditGrid"></div>
+        </section>
+
+        <!-- 2. Chỉ số tổng quan (KPIs) -->
+        <section class="kpi-grid" id="kpiGrid"></section>
+
+        <!-- 3. Biểu đồ phân tích (Visualizer) -->
+        <section class="charts-grid">
+            <div class="card">
+                <h3>Doanh Thu Theo Ngành Hàng (Nghìn VND)</h3>
+                <div class="chart-wrapper"><canvas id="chartCategory"></canvas></div>
+            </div>
+            <div class="card">
+                <h3>Số Đơn Theo Khung Giờ (Peak Hours: 11–13h &amp; 20–22h)</h3>
+                <div class="chart-wrapper"><canvas id="chartHourly"></canvas></div>
+            </div>
+            <div class="card">
+                <h3>Phân Bổ Giá Trị Voucher Theo Phân Khúc AOV</h3>
+                <div class="chart-wrapper"><canvas id="chartAOV"></canvas></div>
+            </div>
+            <div class="card">
+                <h3>So Sánh AOV Theo Freeship &amp; Tương Quan Voucher</h3>
+                <div class="chart-wrapper"><canvas id="chartFreeship"></canvas></div>
+            </div>
+        </section>
+
+        <!-- 4. Phân tích RFM Khách Hàng -->
+        <section class="card">
+            <div class="section-header">
+                <h2>4. Phân Tích Hành Vi Khách Hàng (Top 10 RFM)</h2>
+                <span class="badge" id="pearsonBadge">Pearson r: --</span>
+            </div>
+            <div class="table-responsive">
+                <table id="rfmTable">
+                    <thead>
+                        <tr>
+                            <th>Customer_ID</th>
+                            <th>Recency (Ngày)</th>
+                            <th>Frequency (Đơn)</th>
+                            <th>Monetary (Nghìn VND)</th>
+                            <th>Tỷ Lệ Freeship</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 5. Báo cáo Insight & Đề xuất (ReportGenerator) -->
+        <section class="card">
+            <h2>5. Báo Cáo Insight &amp; Đề Xuất Kinh Doanh</h2>
+            <pre class="report-box" id="reportOutput"></pre>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
